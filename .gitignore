@@ -1,15 +1,21 @@
+# Archives
 **/*.zip
 **/*.7z
 **/*.rar
+**/*.tar
+**/*.gz
 
+# Intermidiate compilation steps, executables
 **/*.out
 **/*.o
 **/*.so
 **/*.exe
 **/*.gch
 
+# Data files
 **/*.csv
 **/*.dat
 **/*.json
 
+# Debugger files
 **/build
