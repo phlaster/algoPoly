@@ -19,3 +19,6 @@
 
 # Debugger files
 **/build
+
+# IDE-s
+.vscode/**
