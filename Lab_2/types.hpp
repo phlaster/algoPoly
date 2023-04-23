@@ -1,8 +1,8 @@
 #ifndef NODECOLOR_HPP
 #define NODECOLOR_HPP
 enum nodeColor {
-  BLACK,
-  RED
+    BLACK,
+    RED
 };
 #endif
 
@@ -10,11 +10,11 @@ enum nodeColor {
 #ifndef NODE_HPP
 #define NODE_HPP
 struct Node {
-  int data;
-  Node *parent;
-  Node *left;
-  Node *right;
-  int color;
+    int data;
+    Node *parent;
+    Node *left;
+    Node *right;
+    int color;
 };
 #endif
 
@@ -29,7 +29,7 @@ typedef Node *NodePtr;
 #define TREE_HPP
 class Tree {
 protected:
-  NodePtr root;
-  NodePtr ENDNULL;
+    NodePtr root;
+    NodePtr ENDNULL;
 };
 #endif
