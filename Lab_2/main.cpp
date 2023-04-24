@@ -18,7 +18,9 @@ int main() {
     std::cout << "Now we delete...\n";
 
     // Пытаемся удалить некоторые значения
-    for (int i = 0; i <= 20; i++) {
+    for (int i = 0; i <= 21; i++) {
         rbTree.deleteNode(2*i+1);
     }
+    std::cout << "\nExecution complete.\n";
+    return 0;
 }
