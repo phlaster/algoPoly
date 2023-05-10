@@ -1,7 +1,7 @@
 #include <cstddef>
 #include "Classes.hpp"
 
-TreeNode::TreeNode(int _minDeg, bool _isLeaf)
+TreeNode::TreeNode(const int _minDeg, const bool _isLeaf)
 {
     minDeg = _minDeg;
     isLeaf = _isLeaf;
@@ -11,7 +11,7 @@ TreeNode::TreeNode(int _minDeg, bool _isLeaf)
 }
 
 
-void TreeNode::insertNonFull(int value) {
+void TreeNode::insertNonFull(const int value) {
     int i = n - 1;
     // Если узел не заполнен, вставка в правильную позицию массива значений
     if (isLeaf) {
@@ -37,7 +37,7 @@ void TreeNode::insertNonFull(int value) {
     }
 }
 
-void TreeNode::splitChild(int i, TreeNode *node)
+void TreeNode::splitChild(const int i, TreeNode *node)
 {
     // Первые minDeg-1 значений и указателей на детей остаются с прежним узлом
     // Остальные значения и указатели на детей передаются новому узлу newNode
