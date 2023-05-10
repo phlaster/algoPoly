@@ -6,7 +6,9 @@
 
 int randInt(int min, int max)
 {
-    return rand() % (max - min + 1) + min;
+    return min<max ?
+        rand() % (max - min + 1) + min :
+        rand() % (min - max + 1) + max;
 }
 
 void Delay(int msec)
