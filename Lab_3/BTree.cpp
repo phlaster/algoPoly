@@ -31,7 +31,7 @@ BTree::~BTree()
     destroyTree(root);
 }
 
-void BTree::insert(int value)
+void BTree::insert(const int value)
 {   
     // Если дерево пустое, создаёт первый узел
     if (root == NULL)
@@ -63,19 +63,21 @@ void BTree::insert(int value)
     }
 }
 
-void BTree::printLevelOrder()
+int BTree::printLevelOrder()
 {
+    int n_nodes = 0;
     // Для пустого дерева
     if (root == NULL)
     {
         std::cout << "Tree is empty!\n";
-        return;
+        return n_nodes;
     }
     // Используем структуру "очередь" из стандартной библиотеки
     std::queue<TreeNode *> q;
     q.push(root);
     while (!q.empty())
     {   
+        std::cout << q.size() << ": ";
         int n = int(q.size());
         for (int i = 0; i < n; i++)
         {
@@ -85,6 +87,7 @@ void BTree::printLevelOrder()
                 Не самая чистая работа. Числа подбирались, чтобы более-менее адекватно
                 Отображать пример из задания и другие деревья на 10-15 элементов
             */
+
             for (int j = 0; j < (40-7*n); j++)
                 std::cout << ' ';
 
@@ -92,9 +95,11 @@ void BTree::printLevelOrder()
             for (int j = 0; j < node->n; j++)
                 std::cout << node->keys[j] << ',';
             std::cout << "\b) "; // Удаляем последнюю запятую
+            n_nodes += 1;
 
             if (!node->isLeaf) for (int k = 0; k <= node->n; k++) q.push(node->children[k]);
         }
         std::cout << std::endl;
     }
+    return n_nodes;
 }
