@@ -12,14 +12,14 @@ class TreeNode
     bool isLeaf; // Является ли узел листом
 public:
     // Конструктор
-    TreeNode(int _minDeg, bool _isLeaf);
+    TreeNode(const int _minDeg, const bool _isLeaf);
     
     // Вставка значения в узел
-    void insertNonFull(int value);
+    void insertNonFull(const int value);
 
     
     // Разделяем i-того ребёнка узла на два узла
-    void splitChild(int i, TreeNode *node);
+    void splitChild(const int i, TreeNode *node);
 
     // Объявляем класс-друг, который будет иметь доступ к приватным полям
     friend class BTree;
@@ -48,9 +48,9 @@ public:
     ~BTree();
     
     // Вставляет значение в дерево
-    void insert(int value);
+    void insert(const int value);
     
-    // Печатаем дерево
-    void printLevelOrder();
+    // Печатаем дерево, возвращает количество узлов
+    int printLevelOrder();
 };
 #endif
