@@ -1,29 +1,74 @@
 #include <cstdlib>
 #include <ctime>
+#include <iostream>
 
 #include "Classes.hpp"
 #include "functions.hpp"
 
 
-void Animation(int delay)
+void runAnimation
+(
+    const int n_values=30,
+    const int minDegree=3,
+    const int delay_ms=200,
+    const int minval = 0,
+    const int maxval=100
+)
 {
-    while (true)
+    int n_nodes = 0;
+    BTree t(minDegree);
+    for(int i=0; i<n_values; i++)
     {
-        BTree t(3);
-        for(int i=0; i<30; i++)
-        {
-            Clear();
-            t.insert(randInt(1, 99));
-            t.printLevelOrder();
-            Delay(delay);
-        }
-        Delay(delay * 10);
+        Clear();
+        std::cout << "Минимальная степень не листового узла: " << minDegree << "\n";
+        std::cout << "Значений: " << i+1 << "/" << n_values << "\n";
+        t.insert(randInt(minval, maxval));
+        n_nodes = t.printLevelOrder();
+        std::cout << "Узлов: " << n_nodes << "\n";
+        Delay(delay_ms);
     }
+    std::cout << "\nДерево нарисовано!\n";
 }
 
 
-int main() {
+int main(int argc, char* argv[]) {
     srand(time(NULL));
-    Animation(300);
+    switch (argc)
+    {
+        case 1:
+            runAnimation();
+        case 2:
+            runAnimation(
+                atoi(argv[1])
+                );
+        case 3:
+            runAnimation(
+                atoi(argv[1]),
+                atoi(argv[2])
+                );
+        case 4:
+            runAnimation(
+                atoi(argv[1]),
+                atoi(argv[2]),
+                atoi(argv[3])
+                );
+        case 5:
+            runAnimation(
+                atoi(argv[1]),
+                atoi(argv[2]),
+                atoi(argv[3]),
+                atoi(argv[4]));
+        case 6:
+            runAnimation(
+                atoi(argv[1]),
+                atoi(argv[2]),
+                atoi(argv[3]),
+                atoi(argv[4]),
+                atoi(argv[5])
+                );
+        default:
+            std::cout << "Wrong number of arguments\n";
+
+    }
     return 0;
 }
