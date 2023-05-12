@@ -1,5 +1,3 @@
-#include <cstdlib>
-#include <ctime>
 #include <iostream>
 
 #include "Classes.hpp"
@@ -37,27 +35,32 @@ int main(int argc, char* argv[]) {
     {
         case 1:
             runAnimation();
+            break;
         case 2:
             runAnimation(
                 atoi(argv[1])
                 );
+            break;
         case 3:
             runAnimation(
                 atoi(argv[1]),
                 atoi(argv[2])
                 );
+            break;
         case 4:
             runAnimation(
                 atoi(argv[1]),
                 atoi(argv[2]),
                 atoi(argv[3])
                 );
+            break;
         case 5:
             runAnimation(
                 atoi(argv[1]),
                 atoi(argv[2]),
                 atoi(argv[3]),
                 atoi(argv[4]));
+            break;
         case 6:
             runAnimation(
                 atoi(argv[1]),
@@ -66,8 +69,10 @@ int main(int argc, char* argv[]) {
                 atoi(argv[4]),
                 atoi(argv[5])
                 );
+            break;
         default:
             std::cout << "Wrong number of arguments\n";
+            break;
 
     }
     return 0;
