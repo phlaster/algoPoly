@@ -1,6 +1,7 @@
 #include <cstddef>
 #include "Classes.hpp"
 
+
 TreeNode::TreeNode(const int _minDeg, const bool _isLeaf)
 {
     minDeg = _minDeg;
@@ -36,6 +37,7 @@ void TreeNode::insertNonFull(const int value) {
         children[i + 1]->insertNonFull(value);
     }
 }
+
 
 void TreeNode::splitChild(const int i, TreeNode *node)
 {
