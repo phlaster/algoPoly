@@ -13,6 +13,11 @@ void runAnimation
     const int maxval=100
 )
 {
+    if (minDegree < 3)
+    {
+        std::cout << "t не может быть меньше 3!\n";
+        return;
+    }
     int n_nodes = 0;
     BTree t(minDegree);
     for(int i=0; i<n_values; i++)
@@ -26,6 +31,7 @@ void runAnimation
         Delay(delay_ms);
     }
     std::cout << "\nДерево нарисовано!\n";
+    return;
 }
 
 
@@ -71,9 +77,8 @@ int main(int argc, char* argv[]) {
                 );
             break;
         default:
-            std::cout << "Wrong number of arguments\n";
+            std::cout << "Некорректное количество аргументов!\n";
             break;
-
     }
     return 0;
 }
