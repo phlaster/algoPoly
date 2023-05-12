@@ -6,7 +6,7 @@
 
 void runAnimation
 (
-    const int n_values=30,
+    const int n_values=20,
     const int minDegree=3,
     const int delay_ms=200,
     const int minval = 0,
