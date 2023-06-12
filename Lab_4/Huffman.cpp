@@ -13,45 +13,6 @@ private:
     friend HuffmanPrinter;
     static Str bitBuffer;
 
-    static Node *buildHuffmanTree(const std ::unordered_map<char, int> &freqTable)
-    {
-
-        auto compare = [](const Node *lhs, const Node *rhs)
-        {
-            return *lhs > *rhs;
-        };
-
-        std::priority_queue<Node *, std::vector<Node *>, decltype(compare)>
-            minHeap(compare);
-
-        for (auto f : freqTable)
-        {
-            // std::cout << f.first << " - " << f.second << "\n"; // debug
-            Node *temp = new Node{f.first, f.second, nullptr, nullptr};
-            minHeap.push(temp);
-        }
-
-        while (minHeap.size() > 1)
-        {
-            Node *left = minHeap.top();
-            minHeap.pop();
-
-            Node *right = minHeap.top();
-            minHeap.pop();
-
-            int freqSum = left->frequency + right->frequency;
-
-            Node *parentNode = new Node{'\0', freqSum, left, right};
-
-            minHeap.push(parentNode);
-        }
-
-        Node *root = minHeap.top();
-        minHeap.pop();
-
-        return root;
-    }
-
     static UMapCode generateCodes(Node *root, Str code)
     {
         UMapCode codeMap;
@@ -95,78 +56,163 @@ private:
         outputFile.close();
     }
     
-public:
-    static void compress(const Str &inputFilePath, const Str &outputFilePath)
+    static UMapFrT buildFrequencyTable(std::ifstream& inputStream)
     {
-        // Step 1: Read input file
-        std::ifstream inputFile(inputFilePath);
-        if (!inputFile.is_open())
-            throw std::invalid_argument("Failed to open input file");
-
-        // Count frequencies of each character in the text
         UMapFrT freqTable;
-        char c = inputFile.get();
 
-        while (inputFile.good())
-        {
+        // Iterate through all characters in input stream and count their frequencies
+        char c;
+        while (inputStream.get(c)) {
             ++freqTable[c];
-            c = inputFile.get();
         }
 
-        if (c != EOF)
-            ++freqTable[c];
+        return freqTable;
+    }
 
-        HuffmanPrinter::printFreq(freqTable);
-
-        // Step 2: Build Huffman Tree
-        Node *root = buildHuffmanTree(freqTable);
-        HuffmanPrinter::printTree(root); // debug
-
-        if (root->left == nullptr && root->right == nullptr)
+    static Node* buildHuffmanTree(const std::unordered_map<char, int>& freqTable)
+    {
+        auto compare = [](const Node *lhs, const Node *rhs)
         {
-            // Single character input file
-            writeSingleCharacterFile(root, outputFilePath);
-            inputFile.close();
-            return;
+            return *lhs > *rhs;
+        };
+
+
+        // Create priority queue of single-node trees ordered by increasing frequency 
+        std::priority_queue<Node*, std::vector<Node*>, decltype(compare)> pq(compare) ;
+        for (const auto& pair : freqTable) {
+            pq.push(new Node(pair.first, pair.second, nullptr, nullptr));
         }
 
-        // Step 3: Generate bit codes for each symbol
-        UMapCode codeMap = generateCodes(root, "");
-        HuffmanPrinter::printCodes(codeMap);
+        // Combine smallest trees into larger ones until there is only one remaining - this will be our root node.
+        while (pq.size() > 1) {
+            Node *left = pq.top();
+            pq.pop();
+            
+            Node *right = pq.top();
+            pq.pop();
+            
+            int combinedFreq = left->frequency + right->frequency; 
+            Node *parent = new Node('\0', combinedFreq, nullptr, nullptr);
+            
+            parent->left = left;
+            parent->right = right;
 
-        // Write compressed data to output file
-        inputFile.clear(); // clear fail and eof bits
-        inputFile.seekg(0, std::ios_base::beg);
-        std::ofstream outputFile(outputFilePath, std::ios_base::out | std::ios_base::binary);
+            pq.push(parent);	
+        }
+    
+        return pq.top(); 
+    }
 
-        if (!outputFile.is_open())
-            throw std::invalid_argument("Failed to open output file");
-
-        char symbol = inputFile.get();
-        while (inputFile.good())
+    static void buildCodeMap(Node *node, const Str& prefix,
+	std::unordered_map<char, Str>& codeMap)
+    {
+        if (node->isLeaf())
         {
-            const auto &code = codeMap[symbol];
-            for (auto c : code)
-            {
-                bitBuffer += Str(1, c);
-                if (bitBuffer.size() == 8)
-                    writeByte(outputFile);
+            codeMap[node->data] = prefix;
+        } else
+        {
+            buildCodeMap(node->left, prefix + "0", codeMap);
+            buildCodeMap(node->right, prefix + "1", codeMap);
+        }
+    }
+
+    static void writeHeader(std::ofstream &outputStream, const UMapFrT &freqTable)
+    {
+        // Write size of frequency table first
+        int freqTableSize = static_cast<int>(freqTable.size());
+        outputStream.write(reinterpret_cast<const char *>(&freqTableSize), sizeof(freqTableSize));
+        
+        // Write out each pair in turn - first character then integer count.
+        for (const auto &pair : freqTable) {
+            outputStream.put(pair.first);
+            outputStream.write(reinterpret_cast<const char *>(&pair.second), sizeof(pair.second));
+        }
+    }
+
+    static int encodeData(std::ifstream& inputStream,
+               std::ofstream& outputStream,
+               const UMapCode& codeMap)
+    {
+        int numEncodedBits = 0;
+        unsigned char buffer = 0;
+        int bufferSize = 0;
+
+        char c;
+        while (inputStream.get(c)) {
+            const Str& code = codeMap.at(c);
+            for (int i = 0; i < static_cast<int>(code.size()); ++i) {
+                if (code[i] == '1')
+                {
+                    buffer |= 1 << (7 - bufferSize);
+                }
+
+                if (++bufferSize == 8)
+                { 
+                    outputStream.put(buffer); 
+                    buffer = 0; // reset buffer
+                    bufferSize = 0; // reset bit size of buffer
+                }
+                numEncodedBits++;
             }
-            symbol = inputFile.get();
         }
 
-        // Write any remaining bits to output file
-        if (bitBuffer.size() > 0)
-        {
-            while (bitBuffer.size() < 8)
-            {
-                bitBuffer.push_back('0');
-            }
-            writeByte(outputFile);
+        return numEncodedBits;
+    }
+
+    static void writeTrailingBits(std::ofstream& outputStream, int numPaddingBits)
+    {
+        // Pad last byte with 0s and write it out along with number of padding bits used  
+        if (numPaddingBits > 0) {
+            unsigned char lastByte = static_cast<unsigned char>(0);
+            outputStream.put(lastByte);
         }
 
-        inputFile.close();
-        outputFile.close();
+        // Write number of padding bits used as a single byte at end of file 
+        outputStream.put(static_cast<unsigned char>(numPaddingBits));
+    }
+
+public:
+    static void compress(std::string inputFile, std::string outputFile)
+    {
+        // Open input file for reading
+        std::ifstream inputStream(inputFile, std::ios_base::binary);
+        if (!inputStream.is_open()) {
+            throw std::runtime_error("Error: could not open input file!");
+        }
+        
+        // Open output file for writing
+        std::ofstream outputStream(outputFile, std::ios_base::binary);
+        if (!outputStream.is_open()) {
+            throw std::runtime_error("Error: could not open output file!");
+        }
+
+        // Create a frequency table of characters in the input stream
+        UMapFrT freqTable = buildFrequencyTable(inputStream);
+
+        // Build Huffman tree based on frequency table 
+        Node* root = buildHuffmanTree(freqTable);
+
+        // Store mapping of characters to their respective Huffman codes in a map
+        UMapCode codeMap;
+        buildCodeMap(root, Str(), codeMap);
+
+        // Write header information (frequency table) at beginning of compressed file
+        writeHeader(outputStream, freqTable);
+
+        // Reset position of input stream back to beginning before encoding data 
+        inputStream.clear();
+        inputStream.seekg(0, inputStream.beg);
+
+        // Encode data using Huffman coding and write it out bit-by-bit into compressed file 
+        int numEncodedBits = encodeData(inputStream, outputStream, codeMap); 
+
+        // Pad last byte with 0s and write it out along with number of padding bits used
+        int numOfPaddingBits = bitBuffer.length() % 8;
+        writeTrailingBits(outputStream, numOfPaddingBits);
+
+        // Close both files when finished.
+        inputStream.close();
+        outputStream.close();
     }
 
     static void decompress(const Str &inputFilePath, const Str &outputFilePath)
