@@ -23,6 +23,11 @@ struct Node
         this->right = right;
     }
 
+    bool isLeaf()
+    {
+        return (this->left == nullptr && this->right == nullptr);
+    }
+
     bool operator>(const Node& other) const
     {
         return frequency > other.frequency;
