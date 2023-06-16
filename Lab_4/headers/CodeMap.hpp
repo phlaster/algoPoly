@@ -8,7 +8,7 @@
 using Str = std::string;
 using mapCode = std::map<char, Str>;
 
-class CodeMap {
+struct CodeMap {
 private:
     mapCode content;
     mapCode generateCodes(Node* nodePtr, const Str& currentCode);
