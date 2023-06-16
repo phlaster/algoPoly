@@ -1,3 +1,4 @@
+#include "headers/HuffmanTree.hpp"
 #include "headers/Node.hpp"
 #include "headers/Printer.hpp"
 #include "headers/CodeMap.hpp"
@@ -14,11 +15,10 @@ using Str =  std::string;
 using mapFrT =  std::map<char, int>;
 
 
-class HuffmanCoding
+class Huffman
 {
 private:
     static std::bitset<8> bitBuffer;
-
 
     static void writeSingleCharacterFile(Node *root, const Str &outputFilePath)
     {
@@ -58,71 +58,6 @@ private:
 
         return freqTable;
     }
-
-    static Node* buildHuffmanTree(const mapFrT& freqTable)
-    {
-        /*
-            Первым шагом этой функции является определение лямбда-функции compare, которая будет использоваться для установки порядка приоритетов элементов в очереди с приоритетами (priority_queue) . Функция принимает два указателя на узлы(Node*), и использует перегруженный оператор ">" для сравнения данных этих двух узлов.
-            
-            Далее происходит создание пустой priority queue - pQueue типа std::priority_queue<Node*, std::vector<Node*>, decltype(compare)>, которая будет использоваться для хранения всех односимвольных деревьев. Каждый элемент этой очереди содержит указатель на Node - это либо отдельный символ (лист дерева), либо поддерево.
-            
-            Затем мы проходим через все пары ключ-значение в freqTable и создаем новый лист(узел) дерева Хaффмaнa, содержащий соответствующую информацию о каждом отдельном символе: значение символа, частоту его появления и два указателя на дочерние узлы (nullptr). Затем этот новый лист добавляется в очередь с приоритетами.
-            
-            Далее мы начинаем объединять наименьшие(самые редкие) деревья, используя алгоритм Хaффмaнa. Непрерывно извлекаем два элемента с минимальными значениями частоты из очереди pQueue, создавая новый узел-родитель. Этот узел-родитель имеет значение '\0' (null character), общую частоту равную суммарной частотности его потомков и каждого потомка присваивает как своего левого или правого потомка.
-            
-            В результате последовательного объединения наименее вероятных символов вышеописанным способом строится полное дерево Хaффмана со стартовым корнем . Как только остается только один элемент в priority queue - это будет корень всего дерева.
-            
-            Наконец, после того как было успешно построено полное бинарное дерево Хaффмана функцией buildHuffmanTree(), она возвращает указатель на корневой узел этого дерева
-        */
-        auto compare = [](const Node *lhs, const Node *rhs)
-        { return *lhs > *rhs; };
-
-        // Create priority queue of single-node trees ordered by increasing frequency 
-        std::priority_queue<Node*, std::vector<Node*>, decltype(compare)> pQueue(compare);
-        for (const auto& pair : freqTable) {
-            pQueue.push(new Node(pair.first, pair.second, nullptr, nullptr));
-        }
-
-        // Combine smallest trees into larger ones until there is only one remaining - this will be our root node.
-        while (pQueue.size() > 1) {
-            Node *left = pQueue.top();
-            pQueue.pop();
-            
-            Node *right = pQueue.top();
-            pQueue.pop();
-            
-            int combinedFreq = left->frequency + right->frequency; 
-            Node *parent = new Node('\0', combinedFreq, nullptr, nullptr);
-            
-            parent->left = left;
-            parent->right = right;
-
-            pQueue.push(parent);	
-        }
-    
-        return pQueue.top(); 
-    }
-
-    // static void buildCodeMap(Node *node, const Str& prefix,	CodeMap& codeMap)
-    // {
-    //     /*
-    //         Метод принимает указатель на корневой узел дерева Хaффмана (Node* node), строку-префикс(prefix) и ссылку на объект std::unordered_map<char, Str>, представляющий таблицу символов(codeMap).
-            
-    //         Алгоритм начинает с проверки того, является ли текущий узел листом. Если да - то мы добавляем в codeMap запись о том, что данный символ закодирован соответствующей строкой prefix.
-            
-    //         Если же текущий узел не является листом - то вызывается buildCodeMap() для его двух потомков(left and right), при этом к префиксам каждого из потомков добавляются "0" или "1", чтобы получить полный бинарный код для данного поддерева.
-            
-    //         Таким образом, рекурсивная функция buildCodeMap() проходится по всем элементам дерева от корня до листьев , генерируя последовательность '0' и '1' для каждого символа в формате строки. В конечном результате все символы будут иметь свои соответствующие бинарные коды в codeMap.
-    //     */
-    //     if (node->isLeaf())
-    //     {
-    //         codeMap[node->data] = prefix;
-    //     } else
-    //     {
-    //         buildCodeMap(node->left, prefix + "0", codeMap);
-    //         buildCodeMap(node->right, prefix + "1", codeMap);
-    //     }
-    // }
 
     static void writeHeader(std::ofstream &outputStream, mapFrT &freqTable)
     {
@@ -247,9 +182,9 @@ public:
         }
 
         mapFrT freqTable = buildFrequencyTable(inputStream);
-        Node* root = buildHuffmanTree(freqTable);
+        HuffmanTree huffTree = HuffmanTree(freqTable);
         
-        CodeMap codeMap(root, Str());
+        CodeMap codeMap(huffTree.tree, Str());
         writeHeader(outputStream, freqTable);
         
         inputStream.clear();
@@ -276,8 +211,8 @@ public:
 
         mapFrT freqTable = readHeader(inputStream);
         Printer::printFreq(freqTable);
-        Node* root = buildHuffmanTree(freqTable);
-        Printer::printTree(root);
+        HuffmanTree huffTree = HuffmanTree(freqTable);
+        Printer::printTree(huffTree.tree);
 
 ///////////////////////////////////////////////////////////////////
 
