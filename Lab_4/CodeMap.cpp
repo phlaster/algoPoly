@@ -1,4 +1,4 @@
-#include "CodeMap.hpp"
+#include "headers/CodeMap.hpp"
 
 CodeMap::CodeMap(Node* root, const Str& initialCode) {
     this->content = generateCodes(root, initialCode);
