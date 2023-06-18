@@ -1,82 +1,81 @@
 #include "headers/Huffman.hpp"
 
 
-void Huffman::compress(std::string inputFile, std::string outputFile)
+int Huffman::encodeData(In& inputStream, Out& outputStream, const CodeMap& codeMap)
 {
-    std::ifstream inputStream(inputFile, std::ios_base::binary);
+    int numEncodedBits = 0;
+    int numPaddingBits = 0;
+    char currentByte = 0;
+    char bakingByte = 0x0; // байт, который будет записан в выходной поток
+    int bitPos = 0;
+
+    while (inputStream.get(currentByte))
+    {
+        // Получаем код символа из карты кодов. 
+        Str code = codeMap.map.at(currentByte);
+        for (char c : code) {
+            if (c == '1')
+            {
+                // Если текущий символ равен '1', то переворачиваем соответствующий бит
+                bakingByte |= (0x80 >> bitPos);
+            }
+            bitPos++;
+            numEncodedBits++;
+
+            if (bitPos > 7)
+            {
+                // записываем bakingByte в выходной поток, обнуляем его
+                outputStream.put(bakingByte);
+                bakingByte = 0;
+                bitPos = 0;
+            }
+        }
+    }
+    if (bitPos > 0)
+    {
+        //  Если мы остановились посередине байта, записываем bakingByte,
+        // т.к. в нём уже присутствуют заполняющие нули
+        numPaddingBits = 8 - bitPos;
+        outputStream.put(bakingByte);
+    }
+    outputStream.put(static_cast<unsigned char>(numPaddingBits));
+
+    return numEncodedBits;
+}
+
+
+void Huffman::compress(Str inputFile, Str outputFile)
+{
+    In inputStream(inputFile, std::ios_base::binary);
     if (!inputStream.is_open()) {
         throw std::runtime_error("Error: could not open input file!");
     }
-    std::ofstream outputStream(outputFile, std::ios_base::binary);
+    Out outputStream(outputFile, std::ios_base::binary);
     if (!outputStream.is_open()) {
         throw std::runtime_error("Error: could not open output file!");
     }
 
+    std::cout << "Кодирование:\n";
     FreqTable freqTable(inputFile);
-    // freqTable.print();
-    
-    HuffmanTree huffTree = HuffmanTree(freqTable);
-    // huffTree.print();
+    freqTable.print();
+    std::cout << "\n";
 
+    HuffmanTree huffTree = HuffmanTree(freqTable);
+
+    // Инициализируем создание карты кодов пустым кодом (пустая строка)
     CodeMap codeMap(huffTree.root, Str());
+    codeMap.print();
+    std::cout << "\n";
+
     writeHeader(outputStream, freqTable);
     
-    // Возврат к началу файлового потока
     inputStream.clear();
     inputStream.seekg(0, inputStream.beg);
     
-
-    int numEncodedBits = encodeData(inputStream, outputStream, codeMap, freqTable);
+    int numEncodedBits = encodeData(inputStream, outputStream, codeMap);
     
-    std::cout << "\n";
-    std::cout << numEncodedBits << " бит было записано!\n";
+    std::cout << numEncodedBits << " основных бит\nИз которых ";
+    std::cout << numEncodedBits % 8 << " в последнем байте\n\n";
     inputStream.close();
     outputStream.close();
-}
-
-int Huffman::encodeData(std::ifstream& inputStream, std::ofstream& outputStream, const CodeMap& codeMap, FreqTable& freaqTable)
-{
-    int totalEncodedBits = 0;
-    unsigned char bakingByte = 0; // будем печь новый байт для записи
-    int numBitsInBuffer = 0;
-    int numPaddingBits = 0;
-
-    char byte;
-    while (inputStream.get(byte)) // читаем по байту за раз
-    {
-        const Str& code = codeMap.at(byte); // получаем его код
-        for (int i = 0; i < static_cast<int>(code.size()); ++i)
-        {
-            if (code[i] == '1')
-            {
-                bakingByte |= 1 << (7 - numBitsInBuffer); // месим тесто
-            }
-
-            if (++numBitsInBuffer == 8)
-            { 
-                outputStream.put(bakingByte); // в духовку его
-                bakingByte = 0; // очищаем за собой стол
-                numBitsInBuffer = 0; // сброс счётчика битов в буфере
-            }
-            totalEncodedBits++;
-        }
-    }
-
-    // Добавляем дополнительные биты для выравнивания последнего байта
-    if (numBitsInBuffer > 0)
-    {
-        numPaddingBits = 8 - numBitsInBuffer;
-        bakingByte <<= numPaddingBits;
-        outputStream.put(bakingByte);
-        totalEncodedBits += numPaddingBits;
-    }
-
-    // Записываем количество дополнительных битов в последний байт
-    if (numPaddingBits > 0)
-    {
-        outputStream.put(static_cast<unsigned char>(numPaddingBits));
-    }
-    freaqTable.numPaddingBits = numPaddingBits;
-
-    return totalEncodedBits;
 }

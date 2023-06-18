@@ -1,10 +1,12 @@
-#include "Huffman.cpp"
+#include "headers/Huffman.hpp"
 
-Str HuffmanCoding::bitBuffer = "";
+
+std::bitset<8> Huffman::bitBuffer;
 
 int main()
 {
-    HuffmanCoding::compress("input.txt", "output.bin");
-    HuffmanCoding::decompress("output.bin", "decoded_output.txt");
+    Huffman::compress("Huffman_DEcode.cpp", "output.bin");
+    Huffman::decompress("output.bin", "decoded_output.txt");
+
     return 0;
 }

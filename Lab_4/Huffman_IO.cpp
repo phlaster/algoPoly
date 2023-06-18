@@ -1,42 +1,30 @@
 #include "headers/Huffman.hpp"
 
 
-void Huffman::writeHeader(std::ofstream &outputStream, FreqTable &freqTable)
+void Huffman::writeHeader(Out& outputStream, FreqTable &freqTable)
 {
-    mapFrT ft = freqTable.table;
-
-    // Первый байт - длина таблицы
-    outputStream << static_cast<char>(ft.size());
+    outputStream << static_cast<unsigned char>(freqTable.size);
     
-    // Write out each pair in turn - first character then integer count.
-    for (const auto& [byte, n]: ft)
+    for (const auto& [byte, freq]: freqTable.table)
     {
         outputStream << byte;
-        outputStream.write(reinterpret_cast<const char*>(&n), sizeof(n));
+        outputStream.write(reinterpret_cast<const char*>(&freq), sizeof(freq));
     }
 }
 
-FreqTable Huffman::readHeader(std::ifstream& inputStream)
+FreqTable Huffman::readHeader(In& inputStream)
 {
     mapFrT freqTable;
-    
-    // Читаем первый байт - размер таблицы
-    uint freqTableSize;
-    inputStream.get(reinterpret_cast<char&>(freqTableSize));
-    // inputStream.read(reinterpret_cast<char*>(&freqTableSize), sizeof(freqTableSize));
-    
-    for (int i = 0; i < freqTableSize; i++) {
-        // Сначала байт
+    char freqTableSize;
+    inputStream.get(freqTableSize);
+
+    for (char i = '\0'; i < freqTableSize; i++) {
         unsigned char c;
         inputStream.get(reinterpret_cast<char&>(c));
         
-        // Потом его частота
         int freq;
         inputStream.read(reinterpret_cast<char*>(&freq), sizeof(freq));
-        
-        // Вносим в таблицу
         freqTable[c] = freq;
     }
-
     return FreqTable(freqTable);
 }

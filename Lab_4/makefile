@@ -1,12 +1,10 @@
 CC=g++
-CFLAGS= -g
+CFLAGS= 
 SOURCE_DIR=.
 OBJECT_DIR=obj
 
-# List all source code (.cpp) files here (without .cpp extension)
-SOURCES=main CodeMap Huffman_ENcode Huffman_DEcode Printer FreqTable Huffman_IO HuffmanTree Node
+SOURCES=main CodeMap Huffman_ENcode Huffman_DEcode FreqTable Huffman_IO HuffmanTree Node
 
-# Generate list of corresponding object file names from sources listed above 
 OBJECTS=$(addprefix $(OBJECT_DIR)/,$(addsuffix .o,$(SOURCES)))
 
 all: MyProject

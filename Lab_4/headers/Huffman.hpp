@@ -2,34 +2,31 @@
 #define HUFFMAN_HPP
 
 #include "HuffmanTree.hpp"
-#include "Node.hpp"
-#include "Printer.hpp"
 #include "CodeMap.hpp"
 #include "FreqTable.hpp"
 
 #include <fstream>
 #include <bitset>
 #include <iostream>
+#include <utility>
 
-
-
-
+using In = std::ifstream;
+using Out = std::ofstream;
+using Str = std::string;
+using Pair = std::pair<int, int>;
 
 class Huffman
 {
 private:
     static std::bitset<8> bitBuffer;
-    static void writeHeader(std::ofstream &outputStream, FreqTable &freqTable);
-    static FreqTable readHeader(std::ifstream& inputStream);
-    static int encodeData(std::ifstream& inputStream, std::ofstream& outputStream, const CodeMap& codeMap, FreqTable& freaqTable);
-    static void decodeData(std::istream& inputStream, std::ostream& outputStream, CodeMap& codeMap, FreqTable& freqTable, HuffmanTree& huffTree);
-    static void writeTrailingBits(std::ofstream& outputStream, int numPaddingBits, std::bitset<8>& bitBuffer);
-
-
+    static int encodeData(In& inputStream, Out& outputStream, const CodeMap& codeMap);
+    static int decodeData(In& inputStream, Out& outputStream, CodeMap& codeMap, HuffmanTree& huffTree);
+    static Pair getPaddingBitsAndFSize(In& fileStream);
 public:
-    static void compress(std::string inputFile, std::string outputFile);
-    static void decompress(std::string inputFile, std::string outputFile);
+    static void compress(Str inputFile, Str outputFile);
+    static void decompress(Str inputFile, Str outputFile);
+    static void writeHeader(Out& outputStream, FreqTable& freqTable);
+    static FreqTable readHeader(In& inputStream);
 };
-
 
 #endif

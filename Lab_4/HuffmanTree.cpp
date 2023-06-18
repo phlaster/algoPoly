@@ -1,55 +1,88 @@
 #include "headers/HuffmanTree.hpp"
-#include "headers/Node.hpp"
-#include <queue>
 
-HuffmanTree::HuffmanTree(const mapFrT& freqTable)
-    {
-        /*
-            Первым шагом этой функции является определение лямбда-функции compare, которая будет использоваться для установки порядка приоритетов элементов в очереди с приоритетами (priority_queue) . Функция принимает два указателя на узлы(Node*), и использует перегруженный оператор ">" для сравнения данных этих двух узлов.
-            
-            Далее происходит создание пустой priority queue - pQueue типа std::priority_queue<Node*, std::vector<Node*>, decltype(compare)>, которая будет использоваться для хранения всех односимвольных деревьев. Каждый элемент этой очереди содержит указатель на Node - это либо отдельный символ (лист дерева), либо поддерево.
-            
-            Затем мы проходим через все пары ключ-значение в freqTable и создаем новый лист(узел) дерева Хaффмaнa, содержащий соответствующую информацию о каждом отдельном символе: значение символа, частоту его появления и два указателя на дочерние узлы (nullptr). Затем этот новый лист добавляется в очередь с приоритетами.
-            
-            Далее мы начинаем объединять наименьшие(самые редкие) деревья, используя алгоритм Хaффмaнa. Непрерывно извлекаем два элемента с минимальными значениями частоты из очереди pQueue, создавая новый узел-родитель. Этот узел-родитель имеет значение '\0' (null character), общую частоту равную суммарной частотности его потомков и каждого потомка присваивает как своего левого или правого потомка.
-            
-            В результате последовательного объединения наименее вероятных символов вышеописанным способом строится полное дерево Хaффмана со стартовым корнем . Как только остается только один элемент в priority queue - это будет корень всего дерева.
-            
-            Наконец, после того как было успешно построено полное бинарное дерево Хaффмана функцией buildHuffmanTree(), она возвращает указатель на корневой узел этого дерева
-        */
-        auto compare = [](const Node *lhs, const Node *rhs)
-        { return *lhs > *rhs; };
 
-        // Create priority queue of single-node trees ordered by increasing frequency 
-        std::priority_queue<Node*, std::vector<Node*>, decltype(compare)> pQueue(compare);
-        for (const auto& pair : freqTable) {
-            pQueue.push(new Node(pair.first, pair.second, nullptr, nullptr));
-        }
+HuffmanTree::HuffmanTree(const FreqTable& freqTable)
+{
+    // Инициализируем переменные нулями.
+    this->numLeaves = 0;
+    this->numNodes = 0;
 
-        // Combine smallest trees into larger ones until there is only one remaining - this will be our root node.
-        while (pQueue.size() > 1) {
-            Node *left = pQueue.top();
-            pQueue.pop();
-            
-            Node *right = pQueue.top();
-            pQueue.pop();
-            
-            int combinedFreq = left->frequency + right->frequency; 
-            Node *parent = new Node('\0', combinedFreq, nullptr, nullptr);
-            
-            parent->left = left;
-            parent->right = right;
+    // Создаем лямбда-функцию compare, которая будет использоваться для
+    // сравнения элементов в приоритетной очереди.
+    auto compare = [](const Node *lhs, const Node *rhs)
+    { return *lhs > *rhs; };
 
-            pQueue.push(parent);	
-        }
+    // Создаем приоритетную очередь, которая будет хранить указатели на узлы дерева.
+    std::priority_queue<Node*, std::vector<Node*>, decltype(compare)> pQueue(compare);
     
-        this->tree = pQueue.top(); 
+    // Добавляем в приоритетную очередь узлы-листья для каждого символа из таблицы
+    // частот. Устанавливаем указатели на левый и правый потомков в nullptr.
+    for (const auto& pair : freqTable.table) {
+        pQueue.push(new Node(pair.first, pair.second, nullptr, nullptr));
+        this->numNodes++;
+        this->numLeaves++;
     }
 
-HuffmanTree::~HuffmanTree() {
-    deleteTree(this->tree);
+    // Выполняем цикл, пока в приоритетной очереди не останется только один элемент.
+    // Извлекаем два узла с наименьшими частотами из приоритетной очереди. Создаем
+    // новый узел-родитель, устанавливаем его частоту как сумму частот левого и
+    // правого потомков. Устанавливаем указатели на левый и правый потомков
+    // родителя. Добавляем новый узел-родитель в приоритетную очередь.
+    while (pQueue.size() > 1) {
+        Node *left = pQueue.top();
+        pQueue.pop();
+        
+        Node *right = pQueue.top();
+        pQueue.pop();
+        
+        int combinedFreq = left->frequency + right->frequency;
+        Node *parent = new Node('0', combinedFreq, nullptr, nullptr);
+        
+        parent->left = left;
+        parent->right = right;
+
+        pQueue.push(parent);
+        this->numNodes++;
+        
+    }
+
+    // Устанавливаем корень дерева как последний элемент в приоритетной очереди.
+    this->root = pQueue.top();
 }
 
+void HuffmanTree::print() {
+    std::cout << "Дерево Хаффмана:\n";
+    std::cout << "Number of nodes: " << this->numNodes << "\n";
+    std::cout << "Number of leaves: " << this->numLeaves << "\n";
+
+    std::queue<Node*> q;
+    q.push(this->root);
+
+    while (!q.empty()) {
+        int levelSize = q.size();
+        for (int i = 0; i < levelSize; i++) {
+            Node* curr = q.front();
+            q.pop();
+
+            if (curr->isLeaf())
+            {
+                std::cout << curr->data << " (" << curr->frequency << ") ";
+            } else {
+                std::cout << " ( ) ";
+                q.push(curr->left);
+                q.push(curr->right);
+            }
+        }
+        std::cout << "\n";
+    }
+}
+
+// Деструктор
+HuffmanTree::~HuffmanTree() {
+    deleteTree(this->root);
+}
+
+// Рекурсивный метод деструктора
 void HuffmanTree::deleteTree(Node* node) {
     if (node != nullptr) {
         deleteTree(node->left);

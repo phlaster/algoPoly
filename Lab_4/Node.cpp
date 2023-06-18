@@ -1,5 +1,6 @@
 #include "headers/Node.hpp"
 
+
 Node::Node(char data, int frequency, Node* left, Node* right)
 {
     this->data = data;
