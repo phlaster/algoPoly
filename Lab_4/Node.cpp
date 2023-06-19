@@ -11,10 +11,12 @@ Node::Node(char data, int frequency, Node* left, Node* right)
 
 bool Node::isLeaf()
 {
+    // Узел - лист, если оба ребёнка пустые
     return (this->left == nullptr && this->right == nullptr);
 }
 
 bool Node::operator>(const Node& other) const
 {
+    // Перегруженный опрератор сравнения узлов по частотам
     return frequency > other.frequency;
 }

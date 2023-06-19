@@ -18,9 +18,8 @@ using Pair = std::pair<int, int>;
 class Huffman
 {
 private:
-    static std::bitset<8> bitBuffer;
     static int encodeData(In& inputStream, Out& outputStream, const CodeMap& codeMap);
-    static int decodeData(In& inputStream, Out& outputStream, CodeMap& codeMap, HuffmanTree& huffTree);
+    static int decodeData(In& inputStream, Out& outputStream, HuffmanTree& huffTree);
     static Pair getPaddingBitsAndFSize(In& fileStream);
 public:
     static void compress(Str inputFile, Str outputFile);

@@ -52,8 +52,8 @@ HuffmanTree::HuffmanTree(const FreqTable& freqTable)
 
 void HuffmanTree::print() {
     std::cout << "Дерево Хаффмана:\n";
-    std::cout << "Number of nodes: " << this->numNodes << "\n";
-    std::cout << "Number of leaves: " << this->numLeaves << "\n";
+    std::cout << "Количество узлов: " << this->numNodes << "\n";
+    std::cout << "Количество листьев: " << this->numLeaves << "\n";
 
     std::queue<Node*> q;
     q.push(this->root);

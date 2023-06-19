@@ -39,7 +39,6 @@ int Huffman::encodeData(In& inputStream, Out& outputStream, const CodeMap& codeM
         outputStream.put(bakingByte);
     }
     outputStream.put(static_cast<unsigned char>(numPaddingBits));
-
     return numEncodedBits;
 }
 
@@ -48,34 +47,34 @@ void Huffman::compress(Str inputFile, Str outputFile)
 {
     In inputStream(inputFile, std::ios_base::binary);
     if (!inputStream.is_open()) {
-        throw std::runtime_error("Error: could not open input file!");
+        throw std::runtime_error("Не удалось открыть файл для чтения!");
     }
     Out outputStream(outputFile, std::ios_base::binary);
     if (!outputStream.is_open()) {
-        throw std::runtime_error("Error: could not open output file!");
+        throw std::runtime_error("Не удалось открыть файл для записи!");
     }
 
     std::cout << "Кодирование:\n";
     FreqTable freqTable(inputFile);
-    freqTable.print();
-    std::cout << "\n";
+    // freqTable.print();
+    // std::cout << "\n";
 
     HuffmanTree huffTree = HuffmanTree(freqTable);
 
     // Инициализируем создание карты кодов пустым кодом (пустая строка)
     CodeMap codeMap(huffTree.root, Str());
-    codeMap.print();
-    std::cout << "\n";
+    // codeMap.print();
+    // std::cout << "\n";
 
     writeHeader(outputStream, freqTable);
     
-    inputStream.clear();
-    inputStream.seekg(0, inputStream.beg);
-    
     int numEncodedBits = encodeData(inputStream, outputStream, codeMap);
     
-    std::cout << numEncodedBits << " основных бит\nИз которых ";
-    std::cout << numEncodedBits % 8 << " в последнем байте\n\n";
     inputStream.close();
     outputStream.close();
+    
+    std::cout << inputFile << " -> " << outputFile << "\n";
+    std::cout << numEncodedBits << " бит закодировано\nИз которых ";
+    std::cout << numEncodedBits % 8 << " в последнем байте\n\n";
+    
 }

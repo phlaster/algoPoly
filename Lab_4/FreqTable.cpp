@@ -1,11 +1,11 @@
 #include "headers/FreqTable.hpp"
 
 
-FreqTable::FreqTable(const String& filename)
+FreqTable::FreqTable(const Str& filename)
 {
     std::ifstream inputStream(filename, std::ios_base::binary);
     if (!inputStream.is_open()) {
-        throw std::runtime_error("Error: could not open input file!");
+        throw std::runtime_error("Не удалось открыть файл для чтения!");
     }
     generateFreqTable(inputStream, this->table, this->size);
 }
@@ -18,7 +18,7 @@ FreqTable::FreqTable(const mapFrT& freqTable)
 }
 
 
-void FreqTable::generateFreqTable(std::ifstream &inputStream, mapFrT& freqTable, int& size)
+void FreqTable::generateFreqTable(In& inputStream, mapFrT& freqTable, int& size)
 {
     char byte;
 

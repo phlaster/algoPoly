@@ -28,7 +28,6 @@ void CodeMap::generateCodes(Node *nodePtr, const Str &currentPrefix)
     generateCodes(nodePtr->right, currentPrefix + "1");
 }
 
-
 void CodeMap::print()
 {
     std::cout << "Словарь кодов Хаффмана:\nДлина:";
