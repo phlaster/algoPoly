@@ -5,7 +5,7 @@
 
 int main()
 {
-    Huffman::compress("test.txt", "output.bin");
+    Huffman::compress("main.cpp", "output.bin");
     Huffman::decompress("output.bin", "decoded_output.txt");
     Huffman::decompress("sample.bin", "decoded_sample.txt");
 
