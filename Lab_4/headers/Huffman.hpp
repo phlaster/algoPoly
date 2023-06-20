@@ -22,8 +22,8 @@ private:
     static int decodeData(In& inputStream, Out& outputStream, HuffmanTree& huffTree);
     static Pair getPaddingBitsAndFSize(In& fileStream);
 public:
-    static void compress(Str inputFile, Str outputFile);
-    static void decompress(Str inputFile, Str outputFile);
+    static void compress(Str inputFile, Str outputFile, bool verbose=false);
+    static void decompress(Str inputFile, Str outputFile, bool verbose=false);
     static void writeHeader(Out& outputStream, FreqTable& freqTable);
     static FreqTable readHeader(In& inputStream);
 };
