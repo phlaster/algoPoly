@@ -7,7 +7,7 @@ SOURCES=main CodeMap Huffman_ENcode Huffman_DEcode FreqTable Huffman_IO HuffmanT
 
 OBJECTS=$(addprefix $(OBJECT_DIR)/,$(addsuffix .o,$(SOURCES)))
 
-all: MyProject
+all: build
 
 MyProject: $(OBJECTS)
 	$(CC) $(CFLAGS) $^ -o $@.out
@@ -22,4 +22,4 @@ clean:
 	rm -f $(OBJECT_DIR)/*
 
 purge:
-	rm -rf $(OBJECT_DIR)/; rm MyProject.out output.bin
+	rm -rf $(OBJECT_DIR)/; rm build.out output.bin
