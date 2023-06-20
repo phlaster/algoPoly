@@ -1,9 +1,9 @@
 #include "headers/Node.hpp"
 
 
-Node::Node(char data, int frequency, Node* left, Node* right)
+Node::Node(char byte, int frequency, Node* left, Node* right)
 {
-    this->data = data;
+    this->byte = byte;
     this->frequency = frequency;
     this->left = left;
     this->right = right;

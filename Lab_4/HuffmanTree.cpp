@@ -14,11 +14,11 @@ HuffmanTree::HuffmanTree(const FreqTable& freqTable)
 
     // Создаем приоритетную очередь, которая будет хранить указатели на узлы дерева.
     std::priority_queue<Node*, std::vector<Node*>, decltype(compare)> pQueue(compare);
-    
+
     // Добавляем в приоритетную очередь узлы-листья для каждого символа из таблицы
     // частот. Устанавливаем указатели на левый и правый потомков в nullptr.
-    for (const auto& pair : freqTable.table) {
-        pQueue.push(new Node(pair.first, pair.second, nullptr, nullptr));
+    for (const auto&[byte, freq] : freqTable.table) {
+        pQueue.push(new Node(byte, freq, nullptr, nullptr));
         this->numNodes++;
         this->numLeaves++;
     }
@@ -31,19 +31,19 @@ HuffmanTree::HuffmanTree(const FreqTable& freqTable)
     while (pQueue.size() > 1) {
         Node *left = pQueue.top();
         pQueue.pop();
-        
+
         Node *right = pQueue.top();
         pQueue.pop();
-        
+
         int combinedFreq = left->frequency + right->frequency;
         Node *parent = new Node('0', combinedFreq, nullptr, nullptr);
-        
+
         parent->left = left;
         parent->right = right;
 
         pQueue.push(parent);
         this->numNodes++;
-        
+
     }
 
     // Устанавливаем корень дерева как последний элемент в приоритетной очереди.
@@ -66,7 +66,7 @@ void HuffmanTree::print() {
 
             if (curr->isLeaf())
             {
-                std::cout << curr->data << " (" << curr->frequency << ") ";
+                std::cout << curr->byte << " (" << curr->frequency << ") ";
             } else {
                 std::cout << " ( ) ";
                 q.push(curr->left);

@@ -19,7 +19,7 @@ void CodeMap::generateCodes(Node *nodePtr, const Str &currentPrefix)
     }
     // Если узел является листом, то добавляем его символ и код в таблицу
     if (nodePtr->left == nullptr && nodePtr->right == nullptr) {
-        this->map[nodePtr->data] = currentPrefix;
+        this->map[nodePtr->byte] = currentPrefix;
     }
 
     // Рекурсивно вызываем метод для левого поддерева, добавляя к текущему префиксу "0"

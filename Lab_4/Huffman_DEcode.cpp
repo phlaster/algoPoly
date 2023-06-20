@@ -6,19 +6,19 @@ Pair Huffman::getPaddingBitsAndFSize(In& fileStream)
     std::streampos currentPosition = fileStream.tellg();
     fileStream.seekg(0, std::ios_base::end);
     std::streampos fileSize = fileStream.tellg();
-    
-    fileStream.seekg(-1,std::ios_base::cur); 
-    
+
+    fileStream.seekg(-1,std::ios_base::cur);
+
     char lastByte; // Здесь записано количество заполняющих нулей в предпоследнем байте
     fileStream.get(lastByte);
     fileStream.seekg(currentPosition, std::ios_base::beg);
-    
+
     // Количество байт, которые остались в файловом потоке (для расшифровки)
     int numBytesRemaining = static_cast<int>(fileSize - currentPosition);
 
     // Заполняющие нули в последнем байте
     int numPaddingBits = static_cast<int>(lastByte);
-    
+
     // Для удобства возвращаем сразу пару значений
     return Pair(numBytesRemaining, numPaddingBits); ;
 }
@@ -42,15 +42,15 @@ int Huffman::decodeData(std::ifstream& inputStream, std::ofstream& outputStream,
             if (bytesDecoded == numBytesRemaining - 1 && i < numPaddingBits) break;
 
             // Если значение бита равно 1, то переходим к правому потомку узла
-            if ((nextByte>>i) & 1) {   
+            if ((nextByte>>i) & 1) {
                 currentNode=currentNode->right;
             } else { // Иначе - к левому
                 currentNode=currentNode->left;
             }
-                       
+
             if (currentNode->isLeaf()) // Если текущий узел является листом
             {
-                outputStream.put(currentNode->data); // записываем его в выходной поток
+                outputStream.put(currentNode->byte); // записываем его в выходной поток
                 ++numDecodedBits;
                 currentNode=huffTree.root;  // переходим к корню дерева Хаффмана
             }
@@ -59,7 +59,7 @@ int Huffman::decodeData(std::ifstream& inputStream, std::ofstream& outputStream,
     return numDecodedBits;
 }
 
-void Huffman::decompress(Str inputFile, Str outputFile)
+void Huffman::decompress(Str inputFile, Str outputFile, bool verbose)
 {
     In inputStream(inputFile, std::ios_base::binary);
     if (!inputStream.is_open()) {
@@ -72,15 +72,23 @@ void Huffman::decompress(Str inputFile, Str outputFile)
 
     std::cout << "Расшифровка:\n";
     FreqTable freqTable = readHeader(inputStream);
-    // freqTable.print();
-    // std::cout << "\n";
+    if(verbose){
+        freqTable.print();
+        std::cout << "\n";
+    }
 
     HuffmanTree huffTree = HuffmanTree(freqTable);
+    if(verbose){
+        huffTree.print();
+        std::cout << "\n";
+    }
 
     // Инициализируем создание карты кодов пустым кодом (пустая строка)
     CodeMap codeMap(huffTree.root, Str());
-    // codeMap.print();
-    // std::cout << "\n";
+    if(verbose){
+        codeMap.print();
+        std::cout << "\n";
+    }
 
     int numDecodedBits = decodeData(inputStream, outputStream, huffTree);
 
@@ -88,5 +96,5 @@ void Huffman::decompress(Str inputFile, Str outputFile)
     outputStream.close();
 
     std::cout << inputFile << " -> " << outputFile << "\n";
-    std::cout << numDecodedBits << " бит было разкодировано!\n\n";
+    std::cout << numDecodedBits << " бит было расшифровано!\n\n";
 }
