@@ -5,22 +5,21 @@
 **/*.tar
 **/*.gz
 
+
 # Intermidiate compilation steps, executables
+objects
 **/*.out
-**/*.o
-**/*.so
 **/*.exe
-**/*.gch
+**/build
+
 
 # Data files
 **/*.csv
 **/*.dat
 **/*.json
-**/*.bin
 **/*.txt
+**/*.bin
 
-# Debugger files
-**/build
 
-# IDE-s
-.vscode/**
+# кроме файла с примером
+!sample.bin
