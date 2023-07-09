@@ -1,4 +1,4 @@
-# Lab works on algirythms
+# Lab works on algorithms
 ## Content:
 * Lab_1 - find biggest square submatrix of random binary matrix
 * ...
