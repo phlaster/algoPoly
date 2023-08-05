@@ -17,7 +17,6 @@ objects
 **/*.csv
 **/*.dat
 **/*.json
-**/*.txt
 **/*.bin
 
 
