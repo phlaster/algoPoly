@@ -78,7 +78,7 @@ void SparseMatrix::print() {
 // Оператор сложения для двух матриц
 SparseMatrix SparseMatrix::operator+(const SparseMatrix& other) const {
     if (rows != other.rows || cols != other.cols) {
-        cerr << "Matrix sizes should be the same!\n"; exit(-1);
+        cerr << "Размеры матриц должны совпадать!\n"; exit(-1);
     }
     SparseMatrix result(rows, cols);
 
@@ -113,7 +113,7 @@ SparseMatrix SparseMatrix::operator-() const {
 // Перегрузка - для реализации полноценного вычитания
 SparseMatrix SparseMatrix::operator-(const SparseMatrix& other) const {
     if (rows != other.rows || cols != other.cols) {
-        cerr << "Matrix sizes should be the same!\n"; exit(-1);
+        cerr << "Размеры матриц должны совпадать!\n"; exit(-1);
     }
     return -other + (*this);
 }
