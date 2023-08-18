@@ -1,40 +1,75 @@
 /*
-    6. Написать процедуры выделения и освобождения памяти блоками
-    произвольного размера. Использовать односвязный список и стратегию 
-"best fit". Написать процедуру проверки целостности списка.
+1. Написать процедуры выделения и освобождения памяти блоками одинакового
+размера. Вместо указателей использовать двухбайтовые индексы В блок добавить
+дескриптор – флаг занятости. Использовать его для контроля повторного
+освобождения памяти.
 */
-
-#include "MemoryManager.hpp"
-
-#include <iostream>
-
-using namespace std;
+#include "funcs.hpp"
 
 int main() {
-    MemoryManager memoryManager;
-    memoryManager.createMemoryBlock(100);
-    memoryManager.createMemoryBlock(100);
-    memoryManager.createMemoryBlock(100);
-    memoryManager.allocate(90);
-    memoryManager.allocate(5);
-    memoryManager.allocate(10);
+    vector<MemoryBlock> memoryBlocks;
+    int totalBlocks;
+    cout << "Введите общее количество блоков памяти: ";
+    cin >> totalBlocks;
 
-
-    bool isIntegrityOk = memoryManager.checkIntegrity();
-
-    cout << "Результаты работы программы:\n";
-    cout << "Список блоков памяти после выделения и освобождения:\n";
-    MemoryBlock* current = memoryManager.getHead();
-    while (current != nullptr) {
-        cout << "\tId блока: " << current->id;
-        cout << "\n\tРазмер блока: " << current->size;
-        cout << "\n\t\tСостояние блока: " << (current->isOccupied ? "Занят" : "Свободен") << "\n";
-        cout << "\t\tУказатель на следующий блок: " << current->next << "\n";
-        current = current->next;
+    memoryBlocks.resize(totalBlocks);
+    for (short i = 0; i < totalBlocks; ++i)
+    {
+        memoryBlocks[i].index = i;
+        memoryBlocks[i].isOccupied = false;
     }
+    cout << "Выделено " << totalBlocks
+        << " блоков с индексами 0.."
+        << totalBlocks-1
+        << ".\n";
+    int choice;
+    do
+    {
+        cout << "Опции:\n"
+             << "\t1. Выделить память\n"
+             << "\t2. Освободить память\n"
+             << "\t3. Показать состояние памяти\n"
+             << "\t4. Выйти\n"
+             << "Введите ваш выбор: ";
+        cin >> choice;
 
-    cout << "Результат проверки целостности списка: ";
-    cout << (isIntegrityOk ? "ОК" : "Ошибка") << "\n";
-
+        switch (choice)
+        {
+        case 1:
+        {
+            Clear();
+            int blockSize;
+            cout << "Введите размер блока памяти для выделения: ";
+            cin >> blockSize;
+            short allocatedIndex = allocateMemory(memoryBlocks, blockSize);
+            if (allocatedIndex != -1)
+                cout << "Выделен блок с индексом "
+                    << allocatedIndex
+                    << ".\n";
+            else
+                cout << "\n\tНе удалось выделить память!\n\n";
+            break;
+        }
+        case 2:
+            Clear();
+            short freeIndex;
+            cout << "Введите номер блока для освобождения: ";
+            cin >> freeIndex;
+            freeMemory(memoryBlocks, freeIndex);
+            break;
+        case 3:
+            Clear();
+            printMemory(memoryBlocks);
+            break;
+        case 4:
+            Clear();
+            cout << "Завершение программы.\n";
+            break;
+        default:
+            Clear();
+            cout << "\n\tНеверная команда!\n\n";
+            break;
+        }
+    } while (choice != 4);
     return 0;
 }
