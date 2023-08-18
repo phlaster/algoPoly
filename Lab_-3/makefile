@@ -34,7 +34,7 @@ $(OBJECT_DIR)/%_DBG.o: $(SOURCE_DIR)/%.cpp | $(OBJECT_DIR)
 
 
 clean:
-	rm -f $(OBJECT_DIR)/*.o; rm m_out.txt
+	rm -f $(OBJECT_DIR)/*.o
 
 purge:
 	rm -rf $(OBJECT_DIR)/; rm $(SOURCE_DIR)/*.out; rm m_out.txt

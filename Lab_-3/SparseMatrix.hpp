@@ -14,7 +14,7 @@ using namespace std;
 
 class SparseMatrix {
 private:
-    Mtr matrix; // Массив списков пар
+    Mtr matrix;
     int rows;
     int cols;
 

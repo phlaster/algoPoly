@@ -13,20 +13,25 @@ int main()
     Str name2 = "m2.txt";
     Str name3 = "m_out.txt";
 
-    cout << "Reading " << name1 << ":\n";
+    cout << "Читаем из " << name1 << ":\n";
     SparseMatrix m1(name1);
     m1.print();
 
-    cout << "Reading " << name2 << ":\n";
+    cout << "Читаем из " << name2 << ":\n";
     SparseMatrix m2(name2);
     m2.print();
     
-    cout << "Calculating m1 - m2:\n";
+    cout << "Вычисляем m1 - m2:\n";
     SparseMatrix result = m1 - m2;
     result.print();
 
-    cout << "Saving result to " << name3 << "\n";
+    cout << "Сохраняем результат в " << name3 << "...\n";
     result.saveto(name3);
+
+    result(1,2) -= 1;
+    result(3,3) = 10;
+    cout << "Печать матрицы после дополнительных операций:\n";
+    result.print();
 
     return 0;
 }
