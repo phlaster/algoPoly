@@ -40,8 +40,6 @@ struct Point {
 using DistanceGrid = vector<vector<int>>;
 using ParentGrid = vector<vector<Point>>;
 
-
-
 // Печать матрицы в терминал
 void print(const DistanceGrid& dGrid) {
     for (size_t i = 0; i < size(dGrid); i++) {
