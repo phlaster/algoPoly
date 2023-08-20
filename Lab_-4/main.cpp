@@ -15,15 +15,16 @@ struct Point {
     int x;
     int y;
 
-    bool operator==(const Point& other){
+    bool operator==(const Point& other) const {
         return x==other.x && y==other.y;
     }
 
-    Point operator+(const Point& other){
+    Point operator+(const Point& other) const {
         return Point({x+other.x, y+other.y});
     }
-    void print(){
-        cout << "x=" << x << ", y=" << y << "\n";
+
+    void print() const {
+        cout << "   x=" << x << ", y=" << y << "\n";
     }
 
     // Сработает для начальной точки маршрута, чей родитель по умолчанию (-1,-1)
@@ -32,8 +33,16 @@ struct Point {
     }
 
     // Проверяем, что точка на доске
-    bool ontable(int N){
+    bool onTable(int N) const{
         return x >= 0 && y >= 0 && x < N && y < N;
+    }
+
+    // Необходимо для цветного отображения
+    bool inVector(const vector<Point>& V) const{
+        for (const auto& p : V)
+            if (p.x == x && p.y == y)
+                return true;
+        return false;
     }
 };
 
@@ -41,14 +50,19 @@ using DistanceGrid = vector<vector<int>>;
 using ParentGrid = vector<vector<Point>>;
 
 // Печать матрицы в терминал
-void print(const DistanceGrid& dGrid) {
+void print(const DistanceGrid& dGrid, const vector<Point>& pts) {
     for (size_t i = 0; i < size(dGrid); i++) {
         for (size_t j = 0; j < size(dGrid[0]); j++)
             // Не более чем двузначные расстояния
-            if (dGrid[i][j]>99){
+            if (dGrid[j][i]>99){
                 cout << " .";
             }else{
-                cout << setw(2) << dGrid[i][j];
+                if (Point({int(j),int(i)}).inVector(pts)){
+                    // Красим цифру, если точка присутствует в пути
+                    cout << "\e[1m\x1B[91m" << setw(2) << dGrid[j][i] << "\033[0m\e[0m";
+                } else{
+                    cout << setw(2) << dGrid[j][i];
+                }
             }
         cout << "\n";
     }
@@ -56,16 +70,15 @@ void print(const DistanceGrid& dGrid) {
 }
 
 // Печать в терминал пройденного пути в обратном порядке
-// За исключением (-1,-1) -- технического родителя начальной точки
-void print(const vector<Point>& ancestors){
-    for (auto p : ancestors)
-        if (!p.isorphan())
-            p.print();
+// За исключением крайних точек и технического родителя (-1,-1)
+void print(const vector<Point>& path){
+    for (int i=size(path)-3; i>0; i--)
+        path[i].print();
 }
 
 // Вернёт путь до текущеё клетки (если алгоритм её посещал)
 vector<Point> findAncestors(const ParentGrid& pGrid, Point p){
-    vector<Point> ancestors(0);
+    vector<Point> ancestors(1, p);
     while (!p.isorphan()){
         p = pGrid[p.x][p.y];
         ancestors.push_back(p);
@@ -80,7 +93,7 @@ pair<DistanceGrid,ParentGrid> pathfinder(int N, const Point& start, const Point&
     };
     // Матрица расстояний, заполняемая алгоритмом
     // Изначально заполнена произвольными большими числами,
-    // Символизирующими бесконечное расстояние
+    // Символизирующими "бесконечное" расстояние
     DistanceGrid distances(N,vector<int>(N,99999));
 
     // Матрица координат точек, из которых мы пришли в текущую
@@ -105,22 +118,24 @@ pair<DistanceGrid,ParentGrid> pathfinder(int N, const Point& start, const Point&
             Point nextPos = currPos+move;
 
             // Второе условие исключает точки, вычисленное расстояние до которых меньше
-            // номера текущего шага, оставляя только неисследованные клетки (с "бесконечными" расстояниями) 
-            if(nextPos.ontable(N) && distances[nextPos.x][nextPos.y] > i) {
+            // номера текущего шага (остаются только с "бесконечными" расстояниями) 
+            if(nextPos.onTable(N) && distances[nextPos.x][nextPos.y] > i) {
                 distances[nextPos.x][nextPos.y] = i;
                 parents[nextPos.x][nextPos.y] = currPos;
                 q.push(nextPos);
             }
+            if (nextPos == stop)
+                return make_pair(distances, parents);
         }
     }
     return make_pair(distances, parents);
 }
 
 int main() {
-    int N, ax, ay, bx, by; // Chessboard size (N x N)
+    int N, ax, ay, bx, by;
     while (true){
         cout << "Введите N: "; cin >> N; 
-        if (N <= 0){
+        if (N<1 || N>50){
             cout << "Завершение программы!\n"; break;
         }
 
@@ -128,28 +143,29 @@ int main() {
         
         Point A = {ax, ay};
         Point B = {bx, by};
-        if (!A.ontable(N) || !B.ontable(N)){
+        if (!A.onTable(N) || !B.onTable(N)){
             cout << "Повторите ввод координат!\n"; continue;
         };
 
-        cout << "Начальная точка:"; A.print();
-        cout << "Конечная точка:"; B.print();
 
         auto [dGrid, pGrid] = pathfinder(N, A, B);
         vector<Point>ancestors = findAncestors(pGrid, B);
-        if (size(ancestors)==0){
+        
+        cout << "Весь путь:\n";
+        cout << "A: x="<<A.x<<", y="<<A.y<<"\n";
+        print(ancestors);
+        cout << "B: x="<<B.x<<", y="<<B.y<<"\n";
+
+        if (size(ancestors)==2){
             // Такое может случиться, если доска слишком мала
-            cout << "Пути не найдено!\n";
+            cout << "Путь не найден или равен нулю!\n";
             continue;
         } else
             // Исключаем предка начальной точки с координатами (-1,-1)
-            cout << "Длина пути: " << size(ancestors)-1 << "\n";
-        
-        cout << "Путь назад:\n";
-        print(ancestors);
-
-        cout << "\nРасстояния до клеток, песещённых алгоритмом:\n";
-        print(dGrid);
+            // И конечную точку
+            cout << "Длина пути: " << size(ancestors)-2 << "\n";
+        cout << "Расстояния до клеток, посещённых алгоритмом:\n";
+        print(dGrid, ancestors);
     }
   	return 0;
 }
