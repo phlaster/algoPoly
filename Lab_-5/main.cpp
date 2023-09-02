@@ -1,8 +1,7 @@
 #include <iostream>
-#include <vector>
-#include <string>
 using namespace std;
 
+// Функция очистки вывода консоли
 void Clear()
 {
     #if defined _WIN32
@@ -14,7 +13,7 @@ void Clear()
     #endif
 }
 
-// Определение структуры узла дерева
+// Структура узла
 struct Node {
     int data;
     Node* left;
@@ -35,10 +34,13 @@ Node* createNode(int data) {
 
 // Функция для вставки узла в бинарное дерево
 Node* insertNode(Node* root, int data) {
+    // Если отсутствует -- создаём корень
     if (root == NULL) {
         root = createNode(data);
         return root;
     }
+
+    //Вставляем потомков в соответствии с их значением
     if (data < root->data) {
         root->left = insertNode(root->left, data);
     } else if (data > root->data) {
@@ -48,6 +50,7 @@ Node* insertNode(Node* root, int data) {
 }
 
 // Функция для вывода содержимого бинарного дерева в прямом порядке
+// Сначала -- текущий узел (начиная с узла), затем его левое поддерево, а затем -- правое.
 void displayPreorder(Node* root) {
     if (root != NULL) {
         cout << root->data << " ";
@@ -58,9 +61,8 @@ void displayPreorder(Node* root) {
 
 // Функция для поиска минимального узла в правом поддереве
 Node* findMin(Node* node) {
-    while (node->left != NULL) {
+    while (node->left != NULL)
         node = node->left;
-    }
     return node;
 } 
 
@@ -103,7 +105,7 @@ void printTree(Node* root, string indent) {
         cout << indent;
         cout << "└─";
         indent += "  ";
-        cout << root->data << endl;
+        cout << root->data << "\n";
         printTree(root->left, indent);
         printTree(root->right, indent);
     }
@@ -131,7 +133,7 @@ int main() {
         switch (choice) {
             case 1:
                 Clear();
-                cout << "Введите значение элемента для вставки: ";
+                cout << "Введите значение для вставки: ";
                 cin >> item;
                 root = insertNode(root, item);
                 break;
@@ -140,7 +142,7 @@ int main() {
                 if (root == nullptr) {
                     cout << "Дерево пустое!" << endl;
                 } else {
-                    cout << "Введите номер узла для удаления: ";
+                    cout << "Введите значение узла для удаления: ";
                     cin >> item;
                     deleteNode(root, item);
                 }
