@@ -1,6 +1,6 @@
 CC=clang++
 LIBFLAGS=-lGL -lglut
-CFLAGS_DBG=-g3 -O0 -Wall -Wextra -Wconversion --std=c++17
+CFLAGS_DBG=-g3 -O0 -Wall -Wextra -Wconversion -Wimplicit --std=c++17
 CFLAGS=-O3 --std=c++17
 SOURCE_DIR=.
 OBJECT_DIR=objects
