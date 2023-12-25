@@ -6,7 +6,7 @@ CodeMap::CodeMap(Node* root, const Str& initialCode) {
     this->size = this->map.size();
 }
 
-Str CodeMap::at(const char& c) const
+Str CodeMap::at(const unsigned char& c) const
 {
     return this->map.at(c);
 }

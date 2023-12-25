@@ -8,14 +8,14 @@
 
 
 using Str = std::string;
-using mapCode = std::map<char, Str>;
+using mapCode = std::map<unsigned char, Str>;
 
 struct CodeMap
 {
     mapCode map;
-    int size;
+    size_t size;
     CodeMap(Node* root, const Str& initialCode);
-    Str at(const char& c) const;
+    Str at(const unsigned char& c) const;
     void print();
 private:
     void generateCodes(Node* nodePtr, const Str& currentCode);

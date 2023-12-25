@@ -18,7 +18,7 @@ FreqTable::FreqTable(const mapFrT& freqTable)
 }
 
 
-void FreqTable::generateFreqTable(In& inputStream, mapFrT& freqTable, int& size)
+void FreqTable::generateFreqTable(In& inputStream, mapFrT& freqTable, size_t& size)
 {
     char byte;
 

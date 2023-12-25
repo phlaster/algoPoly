@@ -3,12 +3,12 @@
 
 struct Node
 {
-    char byte;
+    unsigned char byte;
     int frequency;
     Node* left;
     Node* right;
 
-    Node(char byte, int frequency, Node* left, Node* right);
+    Node(unsigned char byte, int frequency, Node* left, Node* right);
 
     bool isLeaf();
     bool operator>(const Node& other) const;

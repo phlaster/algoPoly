@@ -4,15 +4,15 @@
 int Huffman::encodeData(In& inputStream, Out& outputStream, const CodeMap& codeMap)
 {
     int numEncodedBits = 0;
-    int numPaddingBits = 0;
+    char numPaddingBits = 0;
     char currentByte = 0;
     char bakingByte = 0x0; // байт, который будет записан в выходной поток
-    int bitPos = 0;
+    char bitPos = 0;
 
     while (inputStream.get(currentByte))
     {
         // Получаем код символа из карты кодов.
-        Str code = codeMap.map.at(currentByte);
+        Str code = codeMap.map.at((unsigned char)currentByte);
         for (char c : code) {
             if (c == '1')
             {
@@ -35,10 +35,10 @@ int Huffman::encodeData(In& inputStream, Out& outputStream, const CodeMap& codeM
     {
         //  Если мы остановились посередине байта, записываем bakingByte,
         // т.к. в нём уже присутствуют заполняющие нули
-        numPaddingBits = 8 - bitPos;
+        numPaddingBits = 0x8 - bitPos;
         outputStream.put(bakingByte);
     }
-    outputStream.put(static_cast<unsigned char>(numPaddingBits));
+    outputStream.put(numPaddingBits);
     return numEncodedBits;
 }
 

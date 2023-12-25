@@ -14,12 +14,12 @@ using In = std::ifstream;
 struct FreqTable
 {
     mapFrT table;
-    int size;
+    size_t size;
     int numPaddingBits;
     FreqTable(const Str& filename);
     FreqTable(std::ifstream &inputStream);
     FreqTable(const mapFrT& freqTable);
-    void generateFreqTable(std::ifstream &inputStream, mapFrT& freqTable, int& size);
+    void generateFreqTable(std::ifstream &inputStream, mapFrT& freqTable, size_t& size);
     void print();
 };
 #endif

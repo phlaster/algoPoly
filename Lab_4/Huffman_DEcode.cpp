@@ -50,7 +50,7 @@ int Huffman::decodeData(std::ifstream& inputStream, std::ofstream& outputStream,
 
             if (currentNode->isLeaf()) // Если текущий узел является листом
             {
-                outputStream.put(currentNode->byte); // записываем его в выходной поток
+                outputStream.put((char)currentNode->byte); // записываем его в выходной поток
                 ++numDecodedBits;
                 currentNode=huffTree.root;  // переходим к корню дерева Хаффмана
             }

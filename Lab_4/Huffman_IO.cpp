@@ -4,7 +4,7 @@
 void Huffman::writeHeader(Out& outputStream, FreqTable &freqTable)
 {
     outputStream << static_cast<unsigned char>(freqTable.size);
-    
+
     for (const auto& [byte, freq]: freqTable.table)
     {
         outputStream << byte;
@@ -21,7 +21,7 @@ FreqTable Huffman::readHeader(In& inputStream)
     for (char i = '\0'; i < freqTableSize; i++) {
         unsigned char c;
         inputStream.get(reinterpret_cast<char&>(c));
-        
+
         int freq;
         inputStream.read(reinterpret_cast<char*>(&freq), sizeof(freq));
         freqTable[c] = freq;

@@ -59,8 +59,8 @@ void HuffmanTree::print() {
     q.push(this->root);
 
     while (!q.empty()) {
-        int levelSize = q.size();
-        for (int i = 0; i < levelSize; i++) {
+        size_t levelSize = q.size();
+        for (size_t i = 0; i < levelSize; i++) {
             Node* curr = q.front();
             q.pop();
 
