@@ -1,5 +1,4 @@
 CC=clang++
-LIBFLAGS=-lGL -lglut
 CFLAGS_DBG=-g3 -O0 -Wall -Wextra -Wconversion -Wimplicit --std=c++17
 CFLAGS=-O3 --std=c++17
 SOURCE_DIR=.
@@ -15,7 +14,7 @@ OBJECTS=$(addprefix $(OBJECT_DIR)/,$(addsuffix .o,$(SOURCES)))
 
 all: build
 $(BIN_NAME): $(OBJECTS)
-	$(CC) $(CFLAGS) $^ -o $@.out $(LIBFLAGS)
+	$(CC) $(CFLAGS) $^ -o $@.out
 $(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.cpp | $(OBJECT_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 $(OBJECT_DIR):
@@ -24,7 +23,7 @@ $(OBJECT_DIR):
 
 debug:
 $(DBG_NAME): $(DBG_OBJECTS)
-	$(CC) $(CFLAGS_DBG) $^ -o $@.out $(LIBFLAGS)
+	$(CC) $(CFLAGS_DBG) $^ -o $@.out
 $(OBJECT_DIR)/%_DBG.o: $(SOURCE_DIR)/%.cpp | $(OBJECT_DIR)
 	$(CC) $(CFLAGS_DBG) -c $< -o $@
 
